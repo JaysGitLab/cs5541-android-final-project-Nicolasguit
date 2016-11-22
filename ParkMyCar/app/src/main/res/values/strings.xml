@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ParkMyCar</string>
+    <string name="app_name">Find my Car</string>
+    <string name="pinmylocation">Pin my location</string>
 </resources>
