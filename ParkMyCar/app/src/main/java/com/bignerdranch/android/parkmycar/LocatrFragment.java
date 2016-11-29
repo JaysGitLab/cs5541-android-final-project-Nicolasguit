@@ -1,6 +1,8 @@
 package com.bignerdranch.android.parkmycar;
 
 import android.*;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -25,11 +27,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Date;
+
 /**
  * Created by Nicolas on 17/11/2016.
  */
 public class LocatrFragment extends SupportMapFragment {
+
     private static final String TAG = "LocatrFragment";
+    private static final int REQUEST_CAR_PARK = 0;
 
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 1;
     private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 2;
@@ -154,8 +160,14 @@ public class LocatrFragment extends SupportMapFragment {
             return;
         }
 
+        Intent i = ParkActivity.newIntent(getContext());
+        startActivityForResult(i,REQUEST_CAR_PARK);
+
+        Date parkTime = new Date();
+
         mCar.setLon(mCurrentLocation.getLongitude());
         mCar.setLat(mCurrentLocation.getLatitude());
+        mCar.setParkTime(parkTime);
 
         LatLng myPoint = new LatLng(
                 mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
