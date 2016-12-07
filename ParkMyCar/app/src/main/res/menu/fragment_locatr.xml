@@ -11,7 +11,7 @@
           app:showAsAction="ifRoom"/>
     <item android:id="@+id/action_gps"
           android:icon="@drawable/navigation"
-          android:title="Go to my car"
+          android:title="Get directions"
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>
 </menu>
