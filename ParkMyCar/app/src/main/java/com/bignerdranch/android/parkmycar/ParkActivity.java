@@ -32,7 +32,7 @@ public class ParkActivity extends AppCompatActivity {
     private Button mUnparkButton;
     private TextView textSelect;
 
-    private int mLevel;
+    private int mLevel = 999;
     private boolean park;
 
     public static Intent newIntent(Context packageContext, Car mCar, Bitmap mPhoto, String mTitle) {
@@ -58,7 +58,6 @@ public class ParkActivity extends AppCompatActivity {
             mTextView.setText((String) getIntent().getSerializableExtra(EXTRA_PARKING_NAME));
         }
 
-        mLevel= 999;
         mLevelSelect = (Spinner) findViewById(R.id.level_select);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.level_array, android.R.layout.simple_spinner_item);

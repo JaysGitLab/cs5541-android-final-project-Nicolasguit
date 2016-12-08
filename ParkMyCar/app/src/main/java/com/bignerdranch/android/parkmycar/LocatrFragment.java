@@ -246,8 +246,8 @@ public class LocatrFragment extends Fragment {
                     public void onLocationChanged(Location location) {
                         Log.i(TAG, "Got a fix: " + location);
                         mCurrentLocation = location;
-                        CameraUpdate camera = CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 15);
+                        CameraUpdate camera = CameraUpdateFactory.newLatLng(
+                                new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
                         mMap.animateCamera(camera);
                         if (backToCar) getDirections();
                     }
@@ -445,8 +445,9 @@ public class LocatrFragment extends Fragment {
                     mMap.clear();
                     mMap.addMarker(myMarker);
                 }else {
-                    mCar = null;
                     mMap.clear();
+                    backToCar = false;
+                    mCar = null;
                 }
             }
         }
