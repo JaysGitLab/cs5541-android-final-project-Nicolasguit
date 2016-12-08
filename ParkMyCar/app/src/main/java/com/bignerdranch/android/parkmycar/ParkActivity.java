@@ -18,7 +18,7 @@ import android.widget.TextView;
 public class ParkActivity extends AppCompatActivity {
 
     private static final String TAG = "ParkActivity";
-    private static final String EXTRA_CAR_EXISTS = "com.bignerdranch.android.parkmycar.car_exist";
+    private static final String EXTRA_CAR = "com.bignerdranch.android.parkmycar.car";
     public static final String EXTRA_PARK_OR_NOT = "com.bignerdranch.android.parkmycar.parking";
     private static final String EXTRA_PARKING_PHOTO = "com.bignerdranch.android.parkmycar.parking_photo";
     private static final String EXTRA_PARKING_NAME = "com.bignerdranch.android.parkmycar.parking_name";
@@ -30,13 +30,14 @@ public class ParkActivity extends AppCompatActivity {
     private Spinner mLevelSelect;
     private Button mParkButton;
     private Button mUnparkButton;
+    private TextView textSelect;
 
-    private int mLevel = 0;
+    private int mLevel;
     private boolean park;
 
-    public static Intent newIntent(Context packageContext, boolean carExists, Bitmap mPhoto, String mTitle) {
+    public static Intent newIntent(Context packageContext, Car mCar, Bitmap mPhoto, String mTitle) {
         Intent i = new Intent(packageContext,ParkActivity.class);
-        i.putExtra(EXTRA_CAR_EXISTS,carExists);
+        i.putExtra(EXTRA_CAR,mCar);
         i.putExtra(EXTRA_PARKING_PHOTO, mPhoto);
         i.putExtra(EXTRA_PARKING_NAME,mTitle);
         return i;
@@ -57,6 +58,7 @@ public class ParkActivity extends AppCompatActivity {
             mTextView.setText((String) getIntent().getSerializableExtra(EXTRA_PARKING_NAME));
         }
 
+        mLevel= 999;
         mLevelSelect = (Spinner) findViewById(R.id.level_select);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.level_array, android.R.layout.simple_spinner_item);
@@ -65,7 +67,7 @@ public class ParkActivity extends AppCompatActivity {
         mLevelSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mLevel = position + 1;
+                mLevel = position - 10;
             }
 
             @Override
@@ -102,10 +104,19 @@ public class ParkActivity extends AppCompatActivity {
             }
         });
 
-        boolean carExists = getIntent().getBooleanExtra(EXTRA_CAR_EXISTS,false);
-        if(carExists){
+         textSelect = (TextView) findViewById(R.id.text_select);
+
+        Car mCar = (Car) getIntent().getSerializableExtra(EXTRA_CAR);
+        if(mCar != null){
             mUnparkButton.setEnabled(true);
             mParkButton.setEnabled(false);
+            mSwitch.setEnabled(false);
+            mLevelSelect.setVisibility(View.INVISIBLE);
+            if(mCar.getLevel() != 999){
+                textSelect.setText("Your car is waiting for you at level: " + mCar.getLevel());
+            } else{
+                textSelect.setText("Your car is waiting for you");
+            }
         } else {
             mParkButton.setEnabled(true);
             mUnparkButton.setEnabled(false);

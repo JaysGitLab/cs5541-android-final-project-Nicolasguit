@@ -58,21 +58,20 @@
             android:spinnerMode="dropdown"
             android:visibility="invisible"
             android:textAlignment="center"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@+id/textView"
-            android:layout_toEndOf="@+id/textView"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text_level_select"
-            android:id="@+id/textView"
-            android:textSize="20sp"
-            android:layout_alignTop="@+id/level_select"
+            android:layout_below="@+id/text_select"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text_level_select"
+            android:id="@+id/text_select"
+            android:textSize="20sp"
+            android:layout_below="@+id/ask_level"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="37dp"/>
 
         <Button
             android:layout_width="wrap_content"

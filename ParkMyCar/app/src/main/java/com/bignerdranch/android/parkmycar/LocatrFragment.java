@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,6 +33,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
@@ -76,6 +80,7 @@ public class LocatrFragment extends Fragment {
     private List<LatLng> mLatLngs;
     private Bitmap mParkingPhoto;
     private String mParkingName;
+    private boolean backToCar;
 
     public static LocatrFragment newInstance() {
         return new LocatrFragment();
@@ -95,7 +100,6 @@ public class LocatrFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -182,10 +186,14 @@ public class LocatrFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_locate:
-                pinMyCar();
+                if(isConnectedToInternet(getContext())) pinMyCar();
+                else {
+                    Toast.makeText(getContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.action_gps:
                 if(mCar != null){
+                    backToCar = true;
                     getDirections();
                 }
                 return true;
@@ -215,11 +223,12 @@ public class LocatrFragment extends Fragment {
         }
 
         LocationRequest request = LocationRequest.create();
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        request.setNumUpdates(1);
-        request.setInterval(0);
+        request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        request.setInterval(1000);
+        request.setFastestInterval(1000);
 
         checkGPS();
+
 
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(false);
@@ -240,6 +249,7 @@ public class LocatrFragment extends Fragment {
                         CameraUpdate camera = CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 15);
                         mMap.animateCamera(camera);
+                        if (backToCar) getDirections();
                     }
                 });
     }
@@ -251,6 +261,16 @@ public class LocatrFragment extends Fragment {
         }
     }
 
+    private static boolean isConnectedToInternet(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+    }
+
     public void pinMyCar() {
         if (mMap == null || mCurrentLocation == null) {
             return;
@@ -258,7 +278,7 @@ public class LocatrFragment extends Fragment {
 
         getPlace(mCurrentLocation.getLongitude(), mCurrentLocation.getLatitude());
 
-        Intent intent = ParkActivity.newIntent(getActivity(), mCar != null, mParkingPhoto, mParkingName);
+        Intent intent = ParkActivity.newIntent(getActivity(), mCar, mParkingPhoto, mParkingName);
         startActivityForResult(intent, REQUEST_CAR_PARK);
     }
 
@@ -353,48 +373,56 @@ public class LocatrFragment extends Fragment {
             getPlacePhoto(mPlaceId);
         }
 
+        private void getPlaceName(String placeId){
+            Log.i(TAG,"Looking for a place");
+            Places.GeoDataApi.getPlaceById(mClient, placeId)
+                    .setResultCallback(new ResultCallback<PlaceBuffer>() {
+                        @Override
+                        public void onResult(@NonNull PlaceBuffer result) {
+                            if(result.getStatus().isSuccess() && result.getCount() > 0){
+                                Place myPlace = result.get(0);
+                                mParkingName = myPlace.getName().toString();
+                                Log.i(TAG, "Place found: " + myPlace.getName());
+                            }else {
+                                Log.e(TAG, "Place not found");
+                            }
+                            result.release();
+                        }
+                    });
+        }
+
+        private void getPlacePhoto(String placeId){
+            Log.i(TAG, "Looking for a picture");
+            Places.GeoDataApi.getPlacePhotos(mClient, placeId)
+                    .setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
+                        @Override
+                        public void onResult(@NonNull PlacePhotoMetadataResult photos) {
+                            if(!photos.getStatus().isSuccess()){
+                                Log.e(TAG,"Photo not found");
+                                return;
+                            }
+                            PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
+                            if (photoMetadataBuffer.getCount() > 0) {
+                                // Display the first bitmap in an ImageView in the size of the view
+                                photoMetadataBuffer.get(0).getPhoto(mClient)
+                                        .setResultCallback(new ResultCallback<PlacePhotoResult>() {
+                                            @Override
+                                            public void onResult(PlacePhotoResult placePhotoResult) {
+                                                if (!placePhotoResult.getStatus().isSuccess()) {
+                                                    Log.e(TAG,"Photo not found");
+                                                    return;
+                                                }
+                                                Log.i(TAG, "Photo found");
+                                                mParkingPhoto = placePhotoResult.getBitmap();
+                                            }
+                                        });
+                            }
+                            photoMetadataBuffer.release();
+                        }
+                    });
+        }
     }
 
-    private void getPlaceName(String placeId){
-        Log.i(TAG,"Looking for a place");
-        Places.GeoDataApi.getPlaceById(mClient, placeId)
-                .setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(PlaceBuffer places) {
-                        if (places.getStatus().isSuccess() && places.getCount() > 0) {
-                            final Place myPlace = places.get(0);
-                            mParkingName = myPlace.getName().toString();
-                            Log.i(TAG, "Place found: " + myPlace.getName());
-                        } else {
-                            Log.e(TAG, "Place not found");
-                        }
-                        places.release();
-                    }
-                });
-    }
-
-    private void getPlacePhoto(String placeId){
-        Log.i(TAG, "Looking for a picture");
-        Places.GeoDataApi.getPlacePhotos(mClient, placeId)
-                .setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
-                    @Override
-                    public void onResult(@NonNull PlacePhotoMetadataResult placePhotoMetadataResult) {
-                        if(placePhotoMetadataResult.getStatus().isSuccess() &&
-                                placePhotoMetadataResult.getPhotoMetadata().getCount() > 0) {
-                            placePhotoMetadataResult.getPhotoMetadata().get(0).getPhoto(mClient)
-                                    .setResultCallback(new ResultCallback<PlacePhotoResult>() {
-                                        @Override
-                                        public void onResult(@NonNull PlacePhotoResult placePhotoResult) {
-                                            mParkingPhoto = placePhotoResult.getBitmap();
-                                        }
-                                    });
-                            Log.i(TAG, "Photo found");
-                        } else {
-                            Log.e(TAG, "Photo not found");
-                        }
-                    }
-                });
-    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {{
         if (requestCode == REQUEST_CAR_PARK){
@@ -420,7 +448,6 @@ public class LocatrFragment extends Fragment {
                     mCar = null;
                     mMap.clear();
                 }
-
             }
         }
     }}

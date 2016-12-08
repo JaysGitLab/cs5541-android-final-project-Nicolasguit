@@ -1,11 +1,12 @@
 package com.bignerdranch.android.parkmycar;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Nicolas on 22/11/2016.
  */
-public class Car{
+public class Car implements Serializable{
 
     private double mLat;
     private double mLon;
