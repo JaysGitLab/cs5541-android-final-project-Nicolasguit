@@ -3,6 +3,7 @@ package com.bignerdranch.android.parkmycar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -132,6 +133,30 @@ public class LocatrFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        SharedPreferences mPrefs = getContext().getSharedPreferences("myCar",0);
+        String carString = mPrefs.getString("mCar","");
+        if(carString != "") {
+            try {
+                JSONObject jsonObject = new JSONObject(carString);
+                mCar = new Car();
+                mCar.setLon(jsonObject.getDouble("long"));
+                mCar.setLat(jsonObject.getDouble("lat"));
+                mCar.setLevel(jsonObject.getInt("level"));
+
+                LatLng carPoint = new LatLng(
+                        mCar.getLat(), mCar.getLon());
+
+                MarkerOptions myMarker = new MarkerOptions()
+                        .position(carPoint);
+
+                mMap.clear();
+                mMap.addMarker(myMarker);
+
+            } catch (JSONException je) {
+                je.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -427,6 +452,8 @@ public class LocatrFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {{
         if (requestCode == REQUEST_CAR_PARK){
             if(resultCode == Activity.RESULT_OK){
+                SharedPreferences mPrefs = getContext().getSharedPreferences("ParkMyCar",0);
+                SharedPreferences.Editor editor = mPrefs.edit();
                 if(data.getBooleanExtra(ParkActivity.EXTRA_PARK_OR_NOT,false)){
                     Date parkTime = new Date();
 
@@ -444,10 +471,15 @@ public class LocatrFragment extends Fragment {
 
                     mMap.clear();
                     mMap.addMarker(myMarker);
+
+                    editor.putString("mCar",mCar.getCarJson().toString());
+                    editor.commit();
                 }else {
                     mMap.clear();
                     backToCar = false;
                     mCar = null;
+                    editor.putString("mCar","");
+                    editor.commit();
                 }
             }
         }
