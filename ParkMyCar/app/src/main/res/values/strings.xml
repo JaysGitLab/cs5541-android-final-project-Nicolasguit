@@ -1,4 +1,34 @@
 <resources>
     <string name="app_name">Find my Car</string>
     <string name="pinmylocation">Pin my location</string>
+    <string name="parking_title">Where am I parked?</string>
+    <string name="image_header">Image header</string>
+    <string name="ask_levels">Is there different levels to your parking?</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_park">Park</string>
+    <string name="button_unpark">Unpark</string>
+    <string name="text_level_select">Select your level:</string>
+    <string-array name="level_array">
+        <item>Level -10</item>
+        <item>Level -9</item>
+        <item>Level -8</item>
+        <item>Level -7</item>
+        <item>Level -6</item>
+        <item>Level -5</item>
+        <item>Level -4</item>
+        <item>Level -3</item>
+        <item>Level -2</item>
+        <item>Level -1</item>
+        <item>Level 0</item>
+        <item>Level 1</item>
+        <item>Level 2</item>
+        <item>Level 3</item>
+        <item>Level 4</item>
+        <item>Level 5</item>
+        <item>Level 6</item>
+        <item>Level 7</item>
+        <item>Level 8</item>
+        <item>Level 9</item>
+        <item>Level 10</item>
+    </string-array>
 </resources>

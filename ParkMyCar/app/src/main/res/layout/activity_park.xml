@@ -7,9 +7,85 @@
     android:orientation="vertical"
     tools:context="com.bignerdranch.android.parkmycar.ParkActivity">
 
+    <ImageView
+        android:id="@+id/place_image"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:src="@drawable/parking"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/image_header"/>
     <TextView
+        android:id="@+id/place_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="You're about to park your car."/>
+        android:textSize="26sp"
+        android:text="@string/parking_title"
+        android:layout_marginLeft="10dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_park"
+            android:id="@+id/button_park"
+            android:layout_above="@+id/button_unpark"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
+
+        <Switch
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ask_level"
+            android:layout_gravity="left"
+            android:checked="false"
+            android:text="@string/ask_levels"
+            android:textSize="18sp"/>
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/level_select"
+            android:spinnerMode="dropdown"
+            android:visibility="invisible"
+            android:textAlignment="center"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_toEndOf="@+id/textView"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_level_select"
+            android:id="@+id/textView"
+            android:textSize="20sp"
+            android:layout_alignTop="@+id/level_select"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_unpark"
+            android:id="@+id/button_unpark"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:enabled="false"/>
+
+    </RelativeLayout>
 
 </LinearLayout>

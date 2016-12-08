@@ -5,11 +5,12 @@ import java.util.Date;
 /**
  * Created by Nicolas on 22/11/2016.
  */
-public class Car {
+public class Car{
 
     private double mLat;
     private double mLon;
     private Date mParkTime;
+    private int level;
 
     public double getLon() {
         return mLon;
@@ -33,5 +34,13 @@ public class Car {
 
     public void setParkTime(Date parkTime) {
         mParkTime = parkTime;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }
